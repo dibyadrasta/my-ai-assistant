@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Assistant Hub</title>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; max-width: 750px; margin: 30px auto; padding: 0 20px; background-color: #f8fafc; color: #1e293b; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); margin-bottom: 20px; }
+        h1 { color: #0f172a; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        label { display: block; font-weight: 600; margin: 15px 0 5px; }
+        select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
+        button { background-color: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; width: 100%; transition: background 0.2s; }
+        button:hover { background-color: #1d4ed8; }
+        .output-box { background-color: #f1f5f9; padding: 15px; border-left: 4px solid #2563eb; border-radius: 4px; margin-top: 15px; white-space: pre-wrap; }
+        .prompt-preview { font-family: monospace; background-color: #fef08a; border-left: 4px solid #eab308; }
+        .feedback-section { margin-top: 15px; display: flex; align-items: center; gap: 10px; background: #f0fdf4; padding: 10px; border-radius: 6px; border: 1px solid #bbf7d0; }
+        .fb-btn { width: auto; margin: 0; padding: 6px 12px; background-color: #10b981; }
+        .fb-btn.no { background-color: #ef4444; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>Prompt Engineering AI System</h1>
+        <form method="POST" action="/">
+            
+            <label for="function_type">1. Select AI Core Functionality:</label>
+            <select name="function_type" id="function_type" required>
+                <option value="qa">Answering Factual Questions</option>
+                <option value="summary">Summarizing Articles/Text</option>
+                <option value="creative">Generating Creative Content</option>
+            </select>
+
+            <label for="prompt_style">2. Select Engineered Prompt Style Strategy:</label>
+            <select name="prompt_style" id="prompt_style" required>
+                <option value="short">Strategy A: Short & Explicit Directive</option>
+                <option value="detailed">Strategy B: Roleplay Persona & Contextual Framework</option>
+                <option value="complex">Strategy C: Structured Format Constrained Output</option>
+            </select>
+
+            <label for="user_input">3. Enter Input Context / Subject Query:</label>
+            <textarea name="user_input" id="user_input" rows="4" placeholder="Type factual questions, text snippets to summarize, or character traits here..." required></textarea>
+
+            <button type="submit">Run Engineered Prompt Sequence</button>
+        </form>
+    </div>
+
+    {% if response_text %}
+    <div class="card">
+        <h3>System Output Results</h3>
+        
+        <strong>Constructed System Prompt Passed to Engine:</strong>
+        <div class="output-box prompt-preview" id="currentPrompt">{{ selected_prompt }}</div>
+        
+        <strong>Returned AI Model Text Response:</strong>
+        <div class="output-box">{{ response_text }}</div>
+
+        <div class="feedback-section" id="fbContainer">
+            <span>Was this response engineered effectively?</span>
+            <button class="fb-btn" onclick="sendFeedback('Yes')">Yes 👍</button>
+            <button class="fb-btn no" onclick="sendFeedback('No')">No 👎</button>
+        </div>
+    </div>
+    {% endif %}
+
+    <script>
+        function sendFeedback(isHelpful) {
+            const promptVal = document.getElementById('currentPrompt').innerText;
+            fetch('/submit_feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ helpful: isHelpful, prompt: promptVal })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('fbContainer').innerHTML = `<strong>Feedback Recorded: Thank you for rating this prompt setup!</strong>`;
+            })
+            .catch(err => console.error("Error logging submission data:", err));
+        }
+    </script>
+</body>
+</html>
